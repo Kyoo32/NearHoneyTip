@@ -12,11 +12,15 @@
 @interface NHTTipCollection : NSObject
 
 @property(strong, nonatomic) NSMutableArray* tips;
+@property(strong, nonatomic) NSMutableArray* tipsForSearch;
 
 -(id) init;
 -(void) addTip: (NSDictionary*) tip;
+-(void) addMyTip: (NSDictionary*) tip;
 -(NSInteger)countOfTips;
 -(NSObject*)objectAtIndex:(NSUInteger)index;
 //-(BOOL)containsTip:(NSDictionary*)newTip;
 
+
+-(NSArray*)filteredArrayUsingPredicate:(NSPredicate *)predicate;
 @end

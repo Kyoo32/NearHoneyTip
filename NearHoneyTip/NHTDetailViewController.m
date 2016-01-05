@@ -7,9 +7,13 @@
 //
 
 #import "NHTDetailViewController.h"
+#import "NHTReplyViewController.h"
 #import "NHTTip.h"
+#import "NHTReply.h"
 #import "NHTButtonTapPost.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "NHTAnnotation.h"
+#import "NHTReplyManager.h"
 
 @interface NHTDetailViewController (){
     NSUserDefaults *preferences;
@@ -17,18 +21,26 @@
 @end
 
 @implementation NHTDetailViewController
+@synthesize storeMapView;
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+    NSLog(@"%%%%%%%%%%%%???????");
+    [self.navigationController popViewControllerAnimated:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"backFromDetail" object:nil];
+    
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self.navigationController setNavigationBarHidden:NO animated:nil];
     
     self.postManager = [[NHTButtonTapPost alloc] init];
     if(self.tip){
         
-        
+        self.navigationController.title = self.tip.storeName;
         self.storeName.title = self.tip.storeName;
         
         // modified by ej
-//        self.tipImage.image = self.tip.tipImage;
         
         NSString *tipImagePathWhole = @"http://54.64.250.239:3000/image/photo=";
         tipImagePathWhole = [tipImagePathWhole stringByAppendingString:self.tip.tipImage];
@@ -36,8 +48,6 @@
                          placeholderImage:[UIImage imageNamed:@"nht_logo.png"]];
         
         self.tipDetails.text = self.tip.tipDetails;
-        
-//        self.userProfileImage.image = self.tip.userProfileImg;
         
         self.userProfileImage.layer.cornerRadius = 25;
         NSString *tipIconPathWhole = @"http://54.64.250.239:3000/image/icon=";
@@ -53,15 +63,40 @@
         UITapGestureRecognizer *tapLikeButton = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(didTapLike:)];
         self.likeButton.target = tapLikeButton;
         self.likeButton.action= @selector(didTapLike:);
-       
+        self.likeButtonImage.target = tapLikeButton;
+        self.likeButtonImage.action = @selector(didTapLike:);
+        [self setReplyButtonProperty];
+        
         NSString *distanceWithKm = [NSString stringWithFormat:@"%lu", (unsigned long)self.tip.distance];
         distanceWithKm = [distanceWithKm stringByAppendingString:@" m"];
         
+        /* //상세화면에서 거리 삭제.
         self.distance.text = distanceWithKm;
+         */
         //commentButton
+        
+        //mapView
+        CLLocationCoordinate2D tipLocation;
+        tipLocation.latitude = [self.tip.latitude floatValue];
+        tipLocation.longitude = [self.tip.longitude floatValue];
+        
+        float delta = 0.0011f;
+        
+        MKCoordinateRegion tipRegion;
+        
+        MKCoordinateSpan span;
+        span.latitudeDelta = delta;
+        span.longitudeDelta = delta;
+
+        tipRegion.center = tipLocation;
+        tipRegion.span = span;
+        
+        [self.storeMapView setRegion:tipRegion animated:YES];
+        
+        //mapView annotation
+        NHTAnnotation *storeAnnotation = [[NHTAnnotation alloc] initWithTitle:self.tip.storeName subTitle:distanceWithKm Location:tipLocation];
+        [self.storeMapView addAnnotation:storeAnnotation];
     }
-    
-   
 }
 
 -(void)setLikeButtonProperty{
@@ -102,11 +137,28 @@
         //post syn
         [self.postManager postLikeChangeMethod:@"PUT" Tip:self.tip.tipId];
     }
-    
-     [[NSNotificationCenter defaultCenter] postNotificationName:@"backFromDetail" object:self];
-    
 }
 
+-(void)setReplyButtonProperty{
+    
+    NSString *replyString = @"댓글";
+    NSString *replyCount;
+    
+    if(self.tip.replyInteger){
+        
+        if(self.tip.replyInteger > 0){
+            replyCount = [NSString stringWithFormat:@"%ld", (long)self.tip.replyInteger];
+        } else {
+            replyCount = @"";
+        }
+        
+    } else {
+        replyCount = @"";
+    }
+    
+    replyString = [replyString stringByAppendingString:replyCount];
+    [self.commentButton setTitle:replyString];
+}
 
 -(void)didTapLike{
     self.likeButton.tintColor = [[UIColor alloc]initWithRed: 253.0/255.0 green:204.0/255.0 blue:1.0/255.0 alpha:1];
@@ -133,6 +185,19 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if ([segue.identifier isEqualToString:@"showReplies"]) {
+
+        
+        NHTReplyViewController *replyController = (NHTReplyViewController *)segue.destinationViewController;
+        
+        NHTReplyManager* replyManager = [[NHTReplyManager alloc] init];
+        replyController.NHTRepliesArray = [replyManager replyDidLoad:self.tip.tipId];
+        replyController.NHTReplyTipId = self.tip.tipId;
+    }
 }
 
 /*

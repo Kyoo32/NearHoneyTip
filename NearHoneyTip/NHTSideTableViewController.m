@@ -9,7 +9,6 @@
 #import "NHTSideTableViewController.h"
 #import "NHTTip.h"
 #import "NHTMyTipsController.h"
-#import "NHTAlarmsController.h"
 #import "NHTProfileController.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 
@@ -57,7 +56,7 @@
 }
 
 - (IBAction)cancelWrite:(id)sender {
-    NSLog(@"%@",self.navigationController.viewControllers);
+    NSLog(@"%@", self.navigationController.viewControllers);
     [self.navigationController popToRootViewControllerAnimated:YES];
 }
 

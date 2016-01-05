@@ -7,6 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MapKit/MapKit.h>
+
 @class NHTTip;
 @class NHTButtonTapPost;
 
@@ -14,7 +16,9 @@
 @interface NHTDetailViewController : UIViewController
 
 @property (strong, nonatomic) NHTTip *tip;
+@property (strong, nonatomic) NSMutableArray *replies;
 @property (strong, nonatomic) NHTButtonTapPost *postManager;
+
 
 @property (weak, nonatomic) IBOutlet UINavigationItem *storeName;
 @property (weak, nonatomic) IBOutlet UIImageView *tipImage;
@@ -28,9 +32,9 @@
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *likeButtonImage;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *commentButtonImage;
-@property (weak, nonatomic) IBOutlet UILabel *distance;
+
+@property (weak, nonatomic) IBOutlet MKMapView *storeMapView;
 
 
--(void)checkRefresh;
 
 @end

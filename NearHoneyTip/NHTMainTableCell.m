@@ -12,7 +12,7 @@
 #import <SDWebImage/UIImageView+WebCache.h>
 
 #import "NHTMainViewController.h"
-
+#import "CustomReplyButton.h"
 
 @implementation NHTMainTableCell{
     NSUserDefaults *preferences;
@@ -46,7 +46,7 @@
     self.userNickname.text = self.tip.userNickname;
     self.tipDate.text = self.tip.tipDate;
     
-    NSString *distanceWithKm = [NSString stringWithFormat:@"%u", self.tip.distance];
+    NSString *distanceWithKm = [NSString stringWithFormat:@"%lu", (unsigned long)self.tip.distance];
     distanceWithKm = [distanceWithKm stringByAppendingString:@" m"];
     
     self.distance.text = distanceWithKm;
@@ -72,7 +72,7 @@
     if (self.tip.likeInteger <= 0){
         likeCount = @"";
     } else {
-        likeCount = [NSString stringWithFormat:@"%u", self.tip.likeInteger];
+        likeCount = [NSString stringWithFormat:@"%lu", (unsigned long)self.tip.likeInteger];
     }
     likeString = [likeString stringByAppendingString:likeCount];
     [self.likeButton setTitle:likeString forState:UIControlStateNormal];
@@ -102,6 +102,8 @@
     
     replyString = [replyString stringByAppendingString:replyCount];
     [self.commentButton setTitle:replyString forState:UIControlStateNormal];
+
+    ((CustomReplyButton *)self.commentButton).stringTag = self.tip.tipId;
 }
 
 
@@ -126,14 +128,13 @@
         [self.postManager postLikeChangeMethod:@"PUT" Tip:self.tip.tipId];
     }
     
-   // NHTMainViewController *refresh = [[NHTMainViewController alloc]init];
-   // [refresh getLatestTips];
+
 }
 
 -(void)willPlusLike{
     self.tip.likeInteger = self.tip.likeInteger + 1 ;
     NSString *likeString = @"좋아요 ";
-    likeString = [likeString stringByAppendingString: [NSString stringWithFormat:@"%u", self.tip.likeInteger]];
+    likeString = [likeString stringByAppendingString: [NSString stringWithFormat:@"%lu", (unsigned long)self.tip.likeInteger]];
     [self.likeButton setTitle:likeString forState:UIControlStateNormal];
     
     
@@ -142,7 +143,7 @@
     self.tip.likeInteger = self.tip.likeInteger - 1;
     NSString *likeString = @"좋아요 ";
     if(self.tip.likeInteger > 0){
-        likeString = [likeString stringByAppendingString: [NSString stringWithFormat:@"%u", self.tip.likeInteger]];
+        likeString = [likeString stringByAppendingString: [NSString stringWithFormat:@"%lu", (unsigned long)self.tip.likeInteger]];
     }
     [self.likeButton setTitle:likeString forState:UIControlStateNormal];
     

@@ -1,20 +1,26 @@
 //
-//  NHTMytipsTableCell.m
+//  NHTSearchedCellTableViewCell.m
 //  NearHoneyTip
 //
-//  Created by yunseo shin on 2015. 12. 9..
-//  Copyright © 2015년 Mamamoo. All rights reserved.
+//  Created by Kate KyuWon on 1/5/16.
+//  Copyright © 2016 Mamamoo. All rights reserved.
 //
 
-#import "NHTMytipsTableCell.h"
+#import "NHTSearchedCellTableViewCell.h"
 #import "NHTTip.h"
+#import "NHTButtonTapPost.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 
-@implementation NHTMytipsTableCell
+@implementation NHTSearchedCellTableViewCell
 
-- (void)setCellWithUserTip:(NHTTip*)tip{
-    NSLog(@"mytip: %@", tip.tipDetails);
+
+- (void)setCellWithTip:(NHTTip*)tip{
+    
+    self.postManager = [[NHTButtonTapPost alloc] init];
     self.tip = tip;
+    
+    // modified by ej
+    //    self.tipImage.image = self.tip.tipImage;
     
     NSString *tipImagePathWhole = @"http://54.64.250.239:3000/image/photo=";
     tipImagePathWhole = [tipImagePathWhole stringByAppendingString:self.tip.tipImage];
@@ -28,27 +34,19 @@
     self.userProfileImage.layer.cornerRadius = 16;
     //    self.userProfileImage.image = self.tip.userProfileImg;
     
-    NSUInteger pointOfPathStart = 5;
-    NSString *tipIconImagePath = [self.tip.userProfileImg substringFromIndex: pointOfPathStart];
-    
     NSString *tipIconPathWhole = @"http://54.64.250.239:3000/image/icon=";
-    tipIconPathWhole = [tipIconPathWhole stringByAppendingString:tipIconImagePath];
+    tipIconPathWhole = [tipIconPathWhole stringByAppendingString:self.tip.userProfileImg];
     [self.userProfileImage sd_setImageWithURL:[NSURL URLWithString:tipIconPathWhole]
                              placeholderImage:[UIImage imageNamed:@"nht_logo.png"]];
     
     self.userNickname.text = self.tip.userNickname;
-    self.tipNewTime.text = self.tip.tipDate;
+    self.tipDate.text = self.tip.tipDate;
+    
+    NSString *distanceWithKm = [NSString stringWithFormat:@"%lu", (unsigned long)self.tip.distance];
+    distanceWithKm = [distanceWithKm stringByAppendingString:@" m"];
+    
 }
 
-- (void)awakeFromNib {
-    // Initialization code
-}
 
-//- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-//    [super setSelected:selected animated:animated];
-//
-//     Configure the view for the selected state
-//}
 
 @end
-

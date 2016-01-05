@@ -10,9 +10,10 @@
 
 @class NHTTipManager;
 
-@interface NHTMainViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate>
+@interface NHTMainViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate, UISearchResultsUpdating,UISearchBarDelegate>
 
-
+@property (weak, nonatomic) IBOutlet UIProgressView *tipLoadingProgressBar;
+@property (strong,nonatomic) UISearchController *searchController;
 @property (strong, nonatomic) UIRefreshControl *refreshManager;
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NHTTipManager *Q1;
@@ -20,5 +21,8 @@
 
 - (void)refleshScrollViewDidEndDragging:(UIScrollView *)refreshManager;
 - (void)getLatestTips;
-- (void)newTipReload;
+- (void)shouldNewTipReload;
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar;
+
 @end

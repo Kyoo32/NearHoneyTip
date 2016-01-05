@@ -14,6 +14,7 @@
     self = [super init];
     if(self){
         self.tips = [[NSMutableArray alloc] init];
+        self.tipsForSearch = [[NSMutableArray alloc]init];
     }
     return self;
 }
@@ -21,7 +22,11 @@
 
 -(void) addTip: (NSDictionary*) tip{
     
+    
+    NSDictionary *tipNewDictionary = [[NSDictionary alloc] init];
+    
     NHTTip* tipNew = [[NHTTip alloc] init];
+  
     
     tipNew.tipId = [tip objectForKey:@"_id"];
     //NSLog(@"!String: %@",tipNew.tipId);
@@ -32,18 +37,17 @@
     NSUInteger pointOfPathStart = 5;
     NSString *tipImagePath = [tipImagePathString substringFromIndex: pointOfPathStart];
     
-    // modified by ej
     tipNew.tipImage = tipImagePath;
     
     tipNew.storeName =  [tip valueForKey:@"storename"];
+   // tipNew.name = [tip valueForKey:@"storename"];
+   // [tipNewDictionary setValue:tipNew.storeName forKey:@"name"];
     tipNew.tipDetails = [tip valueForKey:@"tipdetail"];
     
     NSString *userProfileImageString = [tip objectForKey:@"profilephoto"];
     NSString *userProfileImagePath = [userProfileImageString substringFromIndex:pointOfPathStart];
     
-    // modified by ej
     tipNew.userProfileImg = userProfileImagePath;
-    
     tipNew.userNickname = [tip valueForKey:@"nickname"];
     tipNew.tipDate = [tip valueForKey: @"date"];
     
@@ -68,7 +72,60 @@
     } else { //방어용
         tipNew.replyInteger = 0;
     }
+
+    // loc info
+    NSDictionary *tipLocationDictionary = [tip objectForKey:@"loc"];
+    NSArray *tipCoordinates = [tipLocationDictionary objectForKey:@"coordinates"];
+    tipNew.longitude = tipCoordinates[0];
+    tipNew.latitude = tipCoordinates[1];
+    
     [self.tips addObject:tipNew];
+    
+    
+    }
+
+-(void) addMyTip: (NSDictionary*) tip{
+    
+    NHTTip* tipNew = [[NHTTip alloc] init];
+    
+    
+    tipNew.tipId = [tip objectForKey:@"_id"];
+    //NSLog(@"!String: %@",tipNew.tipId);
+    NSArray *tipImageFile = [tip objectForKey:@"file"];
+    //NSLog(@"###STRing: %@",tipImageFile);
+    NSDictionary *tipImagePathDictionary = tipImageFile[0];
+    NSString *tipImagePathString = [tipImagePathDictionary objectForKey:@"path"];
+    NSUInteger pointOfPathStart = 5;
+    NSString *tipImagePath = [tipImagePathString substringFromIndex: pointOfPathStart];
+    
+    tipNew.tipImage = tipImagePath;
+    tipNew.storeName =  [tip valueForKey:@"storename"];
+    //[tipNew setValue:tipNew.storeName forKey:@"storeName"];
+   
+    
+    tipNew.tipDetails = [tip valueForKey:@"tipdetail"];
+    tipNew.tipDate = [tip valueForKey: @"date"];
+    
+    tipNew.likeInteger = ((NSNumber*)[tip valueForKey:@"like"]).integerValue;
+    //NSLog(@"like array: %@", tipNew.likeInteger);
+    tipNew.replies = [tip valueForKey:@"reply"];
+    tipNew.isLiked = ((NSNumber*)[tip valueForKey:@"isliked"]).boolValue;
+    
+    if(tipNew.replies){
+        tipNew.replyInteger = [tipNew.replies count];
+    } else { //방어용
+        tipNew.replyInteger = 0;
+    }
+    
+    // loc info
+    NSDictionary *tipLocationDictionary = [tip objectForKey:@"loc"];
+    NSArray *tipCoordinates = [tipLocationDictionary objectForKey:@"coordinates"];
+    tipNew.longitude = tipCoordinates[0];
+    tipNew.latitude = tipCoordinates[1];
+    
+    [self.tips addObject:tipNew];
+    
+    NSLog(@"add my tip: , %@", tipNew.storeName);
 }
 
 /*
@@ -91,6 +148,10 @@
 
 -(NSObject*)objectAtIndex:(NSUInteger)index{
     return [self.tips objectAtIndex:index];
+}
+
+-(NSArray*)filteredArrayUsingPredicate:(NSPredicate *)predicat{
+    return [self.tips filteredArrayUsingPredicate:predicat];
 }
 
 @end
